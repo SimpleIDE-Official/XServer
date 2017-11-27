@@ -1317,15 +1317,13 @@ cd $BUILDDIR
 } || exit 1
 
 # =========== xsdl ==========
-
 ln -sf $BUILDDIR/../../../../../../libs/$TARGET_ARCH/libsdl-1.2.so $BUILDDIR/libSDL.so
 ln -sf $BUILDDIR/libportable.a $BUILDDIR/libpthread.a # dummy
 ln -sf $BUILDDIR/libportable.a $BUILDDIR/libts.a # dummy
 
 [ -z "$PACKAGE_NAME" ] && PACKAGE_NAME=io.neoterm
 
-[ -e Makefile ] && grep "`pwd`" Makefile > /dev/null || \
-env CFLAGS=" -DDEBUG \
+CFLAGS=" -DDEBUG \
 	-isystem$BUILDDIR \
 	-isystem$BUILDDIR/../android-shmem \
 	-include strings.h\
@@ -1336,23 +1334,50 @@ env CFLAGS=" -DDEBUG \
 	-DSO_REUSEADDR=1 \
 	-Dipc_perm=debian_ipc_perm \
 	-I$BUILDDIR/pixman-0.30.2/pixman \
+	-I$BUILDDIR/libXfont-1.4.6/include \
+	-I$BUILDDIR/libXau-1.0.8/include \
+	-I$BUILDDIR/libXdmcp-1.1.1/include \
 	-I$BUILDDIR/../../../../../../jni/sdl-1.2/include \
-	-I$BUILDDIR/../../../../../../jni/crypto/include" \
-LDFLAGS="-L$BUILDDIR -L$BUILDDIR/../../../../../../jni/crypto/lib-$TARGET_ARCH" \
-./setCrossEnvironment.sh \
-LIBS="-lfontenc -lfreetype -llog -lSDL -lGLESv1_CM -landroid-shmem -l:libcrypto.so.sdl.0.so" \
-OPENSSL_LIBS=-l:libcrypto.so.sdl.0.so \
-LIBSHA1_LIBS=-l:libcrypto.so.sdl.0.so \
-../../configure \
---host=$TARGET_HOST \
---prefix=$TARGET_DIR/usr \
---with-xkb-output=$TARGET_DIR/tmp \
---disable-xorg --disable-dmx --disable-xvfb --disable-xnest --disable-xquartz --disable-xwin \
---disable-xephyr --disable-xfake --disable-xfbdev --disable-unit-tests --disable-tslib \
---disable-dri --disable-dri2 --disable-glx --disable-xf86vidmode \
---enable-xsdl --enable-kdrive --enable-kdrive-kbd --enable-kdrive-mouse --enable-kdrive-evdev \
---enable-shm --enable-mitshm --disable-config-udev \
-|| exit 1
+	-I$BUILDDIR/../../../../../../jni/crypto/include"
+
+LDFLAGS=" \
+    -L$BUILDDIR \
+    -L$BUILDDIR/../../../../../../jni/crypto/lib-$TARGET_ARCH"
+
+LIBS=" \
+    -lXfont \
+    -lfontenc \
+    -lfreetype \
+    -lXdmcp \
+    -lXau \
+    -llog \
+    -lSDL \
+    -lGLESv1_CM \
+    -landroid-shmem \
+    -l:libcrypto.so.sdl.1.so"
+
+[ -e Makefile ] && grep "`pwd`" Makefile > /dev/null || \
+env \
+    XSERVERCFLAGS_CFLAGS="$CFLAGS" \
+    XSERVERCFLAGS_LIBS="$LIBS" \
+    XSERVERLIBS_CFLAGS="$CFLAGS" \
+    XSERVERLIBS_LIBS="$LIBS" \
+    CFLAGS="$CFLAGS" \
+    LDFLAGS="$LDFLAGS" \
+    ./setCrossEnvironment.sh \
+        LIBS="$LIBS" \
+        OPENSSL_LIBS=-l:libcrypto.so.sdl.1.so \
+        LIBSHA1_LIBS=-l:libcrypto.so.sdl.1.so \
+        ../../configure \
+        --host=$TARGET_HOST \
+        --prefix=$TARGET_DIR/usr \
+        --with-xkb-output=$TARGET_DIR/tmp \
+        --disable-xorg --disable-dmx --disable-xvfb --disable-xnest --disable-xquartz --disable-xwin \
+        --disable-xephyr --disable-xfake --disable-xfbdev --disable-unit-tests --disable-tslib \
+        --disable-dri --disable-dri2 --disable-glx --disable-xf86vidmode \
+        --enable-xsdl --enable-kdrive --enable-kdrive-kbd --enable-kdrive-mouse --enable-kdrive-evdev \
+        --enable-shm --enable-mitshm --disable-config-udev \
+    || exit 1
 
 ./setCrossEnvironment.sh make -j$NCPU V=1 2>&1 || exit 1
 
