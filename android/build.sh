@@ -599,13 +599,15 @@ ln -sf ../$PKGDIR/include/X11/Xdmcp.h X11/
 } || exit 1
 
 # =========== xcbproto ===========
-[ -e proto-1.8 ] || {
-PKGURL=https://cgit.freedesktop.org/xcb/proto/snapshot/proto-1.8.tar.gz
+[ -e proto-1.12 ] || {
+PKGURL=https://cgit.freedesktop.org/xcb/proto/snapshot/proto-1.12.tar.gz
 PKGDIR=`basename --suffix=.tar.gz $PKGURL`
 echo $PKGDIR: $PKGURL
 [ -e ../$PKGDIR.tar.gz ] || curl $PKGURL -o ../$PKGDIR.tar.gz || rm ../$PKGDIR.tar.gz
 tar xvzf ../$PKGDIR.tar.gz || exit 1
 cd $PKGDIR
+
+#patch -p1 < ../../xcb-proto-1.9.patch || exit 1
 
 $BUILDDIR/setCrossEnvironment.sh \
 ./autogen.sh --host=$TARGET_HOST \
@@ -618,12 +620,14 @@ cd $BUILDDIR
 # =========== libxcb.a ==========
 
 [ -e libxcb.a ] || {
-PKGURL=https://cgit.freedesktop.org/xcb/libxcb/snapshot/libxcb-1.10.tar.gz
+PKGURL=https://cgit.freedesktop.org/xcb/libxcb/snapshot/libxcb-1.12.tar.gz
 PKGDIR=`basename --suffix=.tar.gz $PKGURL`
 echo $PKGDIR: $PKGURL
 [ -e ../$PKGDIR.tar.gz ] || curl $PKGURL -o ../$PKGDIR.tar.gz || rm ../$PKGDIR.tar.gz
 tar xvzf ../$PKGDIR.tar.gz || exit 1
 cd $PKGDIR
+
+#patch -p1 < ../../libxcb-1.9.patch || exit 1
 
 [ -e configure ] || \
 autoreconf -v --install \
@@ -1194,7 +1198,7 @@ PKGURL=http://web.aanet.com.au/gwg/xli-1.16.tar.gz
 PKGDIR=`basename --suffix=.tar.gz $PKGURL`
 echo $PKGDIR: $PKGURL
 [ -e ../$PKGDIR.tar.gz ] || curl $PKGURL -o ../$PKGDIR.tar.gz || rm ../$PKGDIR.tar.gz
-tar xvzf ../$PKGDIR.tar.gz || exit 1
+tar xvf ../$PKGDIR.tar.gz || exit 1
 cd $PKGDIR
 
 echo "SRCS := bright.c clip.c cmuwmrast.c compress.c dither.c faces.c fbm.c \
@@ -1235,7 +1239,7 @@ sh -c '$STRIP xli'
 
 [ -e pie/xli ] || {
 cd pie
-tar xvzf ../../$PKGDIR.tar.gz || exit 1
+tar xvf ../../$PKGDIR.tar.gz || exit 1
 cd $PKGDIR
 
 cp -f ../../$PKGDIR/Makefile ./
