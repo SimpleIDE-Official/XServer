@@ -1322,7 +1322,7 @@ ln -sf $BUILDDIR/../../../../../../libs/$TARGET_ARCH/libsdl-1.2.so $BUILDDIR/lib
 ln -sf $BUILDDIR/libportable.a $BUILDDIR/libpthread.a # dummy
 ln -sf $BUILDDIR/libportable.a $BUILDDIR/libts.a # dummy
 
-[ -z "$PACKAGE_NAME" ] && PACKAGE_NAME=X.org.server
+[ -z "$PACKAGE_NAME" ] && PACKAGE_NAME=io.neoterm
 
 [ -e Makefile ] && grep "`pwd`" Makefile > /dev/null || \
 env CFLAGS=" -DDEBUG \
