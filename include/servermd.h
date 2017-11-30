@@ -283,6 +283,13 @@ SOFTWARE.
 #define GLYPHPADBYTES		4
 #endif
 
+/* linux on Android */
+#if defined(ANDROID)
+#define IMAGE_BYTE_ORDER	LSBFirst
+#define BITMAP_BIT_ORDER	LSBFirst
+#define GLYPHPADBYTES		4
+#endif
+
 /* linux on IBM S/390 */
 #if defined (linux) && defined (__s390__)
 #define IMAGE_BYTE_ORDER	MSBFirst
