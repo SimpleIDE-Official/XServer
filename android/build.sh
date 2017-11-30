@@ -1125,13 +1125,15 @@ echo $PKGDIR: $PKGURL
 tar xvzf ../$PKGDIR.tar.gz || exit 1
 cd $PKGDIR
 
+patch -p0 < ../../xhost.patch || exit 1
+
 [ -e configure ] || \
 autoreconf -v --install \
 || exit 1
 
 env CFLAGS="-isystem$BUILDDIR \
 -include strings.h \
--Dsethostent=abs -Dendhostent=sync -Os -DSO_REUSEADDR=1" \
+-Os -DSO_REUSEADDR=1" \
 LDFLAGS="-L$BUILDDIR" \
 LIBS="-lxcb -lXau -lXdmcp -landroid_support -lX11" \
 $BUILDDIR/setCrossEnvironment.sh \
@@ -1160,13 +1162,15 @@ cd pie
 tar xvzf ../../$PKGDIR.tar.gz || exit 1
 cd $PKGDIR
 
+patch -p0 < ../../../xhost.patch || exit 1
+
 [ -e configure ] || \
 autoreconf -v --install \
 || exit 1
 
 env CFLAGS="-isystem$BUILDDIR \
 -include strings.h \
--Dsethostent=abs -Dendhostent=sync -Os -DSO_REUSEADDR=1" \
+-Os -DSO_REUSEADDR=1" \
 LDFLAGS="-pie -L$BUILDDIR" \
 LIBS="-lxcb -lXau -lXdmcp -landroid_support -lX11" \
 $BUILDDIR/setCrossEnvironment.sh \
