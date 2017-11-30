@@ -1,0 +1,162 @@
+--- gif.c.orig	2017-12-01 00:56:32.316193185 +0800
++++ gif.c	2017-12-01 01:02:17.403148333 +0800
+@@ -64,13 +64,12 @@
+  * the error number.
+  */
+ static char *
+-get_err_string(errno)
+-int errno;
++get_err_string(int my_errno)
+ {
+   int i;
+   for (i=0;gif_err_strings[i].err_no != 0;i++)
+   {
+-    if (gif_err_strings[i].err_no == errno)
++    if (gif_err_strings[i].err_no == my_errno)
+ 		return gif_err_strings[i].name;
+   }
+   return "";
+@@ -155,7 +154,7 @@
+ static int gifin_open_file(s)
+      ZFILE *s;
+ {
+-  int errno;
++  int my_errno;
+   /* make sure there isn't already a file open */
+   if (file_open)
+     return GIFIN_ERR_FAO;
+@@ -203,8 +202,8 @@
+   {
+     gifin_g_ncolors = (1 << gifin_g_pixel_bits);
+ 
+-    if ((errno = gifin_load_cmap(gifin_g_cmap, gifin_g_ncolors)) != GIFIN_SUCCESS)
+-      return errno;
++    if ((my_errno = gifin_load_cmap(gifin_g_cmap, gifin_g_ncolors)) != GIFIN_SUCCESS)
++      return my_errno;
+   }
+   else
+   {
+@@ -226,7 +225,7 @@
+ {
+   int i;
+   int separator;
+-  int errno;
++  int my_errno;
+ 
+   /* make sure there's a file open */
+   if (!file_open)
+@@ -245,8 +244,8 @@
+     separator = zgetc(ins);
+     if (separator == GIF_EXTENSION)
+     {
+-      if ((errno = gifin_skip_extension()) != GIFIN_SUCCESS)
+-        return errno;
++      if ((my_errno = gifin_skip_extension()) != GIFIN_SUCCESS)
++        return my_errno;
+     }
+   }
+   while (separator == GIF_EXTENSION);
+@@ -277,8 +276,8 @@
+   {
+     gifin_l_ncolors = (1 << gifin_l_pixel_bits);
+ 
+-    if ((errno = gifin_load_cmap(gifin_l_cmap, gifin_l_ncolors)) != GIFIN_SUCCESS)
+-      return errno;
++    if ((my_errno = gifin_load_cmap(gifin_l_cmap, gifin_l_ncolors)) != GIFIN_SUCCESS)
++      return my_errno;
+   }
+   else
+   {
+@@ -320,7 +319,7 @@
+   int  code;
+   int  first;
+   int  place;
+-  int  errno;
++  int  my_errno;
+ 
+   /* decode until there are some pixels on the pixel stack */
+   while (pstk_idx == 0)
+@@ -331,8 +330,8 @@
+       if (buf_idx == buf_cnt)
+       {
+         /* read a new data block */
+-        if ((errno = gifin_read_data_block()) != GIFIN_SUCCESS)
+-          return errno;
++        if ((my_errno = gifin_read_data_block()) != GIFIN_SUCCESS)
++          return my_errno;
+ 
+         if (buf_cnt == 0)
+           return GIFIN_ERR_EOD;
+@@ -382,8 +381,8 @@
+         pstk[place] = first;
+       }
+ 
+-      if((errno = gifin_add_string(prev_code, first)) != GIFIN_SUCCESS)
+-        return errno;
++      if((my_errno = gifin_add_string(prev_code, first)) != GIFIN_SUCCESS)
++        return my_errno;
+       prev_code = code;
+     }
+   }
+@@ -443,7 +442,7 @@
+ 
+ static int gifin_skip_extension()
+ {
+-  int errno;
++  int my_errno;
+ 
+   /* get the extension function byte */
+   zgetc(ins);
+@@ -451,8 +450,8 @@
+   /* skip any remaining raster data */
+   do
+   {
+-    if ((errno = gifin_read_data_block()) != GIFIN_SUCCESS)
+-      return errno;
++    if ((my_errno = gifin_read_data_block()) != GIFIN_SUCCESS)
++      return my_errno;
+   }
+   while (buf_cnt > 0);
+ 
+@@ -529,7 +528,7 @@
+   Image *image;
+   int    x, y, pixel, pass, scanlen;
+   byte  *pixptr, *pixline;
+-  int errno;
++  int my_errno;
+ 
+   if (! (zf= zopen(fullname))) {
+     perror("gifLoad");
+@@ -587,8 +586,8 @@
+       while (y < gifin_img_height) {
+ 	pixptr= pixline;
+ 	for (x= 0; x < gifin_img_width; x++) {
+-	  if ((errno = gifin_get_pixel(&pixel)) != GIFIN_SUCCESS) {
+-	    fprintf(stderr, "gifLoad: %s - Short read within image data, '%s'\n", name, get_err_string(errno));
++	  if ((my_errno = gifin_get_pixel(&pixel)) != GIFIN_SUCCESS) {
++	    fprintf(stderr, "gifLoad: %s - Short read within image data, '%s'\n", name, get_err_string(my_errno));
+ 	    y = gifin_img_height; x = gifin_img_width;
+ 	  }
+ 	  valToMem(pixel, pixptr, image->pixlen);
+@@ -608,8 +607,8 @@
+       pixptr= image->data;
+       for (y= 0; y < gifin_img_height; y++)
+         for (x= 0; x < gifin_img_width; x++) {
+-          if ((errno = gifin_get_pixel(&pixel)) != GIFIN_SUCCESS) {
+-	    fprintf(stderr, "gifLoad: %s - Short read within image data, '%s'\n", name, get_err_string(errno));
++          if ((my_errno = gifin_get_pixel(&pixel)) != GIFIN_SUCCESS) {
++	    fprintf(stderr, "gifLoad: %s - Short read within image data, '%s'\n", name, get_err_string(my_errno));
+             y = gifin_img_height; x = gifin_img_width;
+           }
+           valToMem(pixel, pixptr, 1);
+@@ -620,8 +619,8 @@
+       pixptr= image->data;
+       for (y= 0; y < gifin_img_height; y++)
+         for (x= 0; x < gifin_img_width; x++) {
+-          if ((errno = gifin_get_pixel(&pixel)) != GIFIN_SUCCESS) {
+-	    fprintf(stderr, "gifLoad: %s - Short read within image data, '%s'\n", name, get_err_string(errno));
++          if ((my_errno = gifin_get_pixel(&pixel)) != GIFIN_SUCCESS) {
++	    fprintf(stderr, "gifLoad: %s - Short read within image data, '%s'\n", name, get_err_string(my_errno));
+             y = gifin_img_height; x = gifin_img_width;
+           }
+           valToMem(pixel, pixptr, image->pixlen);

@@ -1,0 +1,19 @@
+--- xhost.c.orig	2017-12-01 00:43:09.868252918 +0800
++++ xhost.c	2017-12-01 00:43:16.560041195 +0800
+@@ -851,3 +851,15 @@
+ {}
+ #endif
+ 
++#if defined(ANDROID)
++void sethostent(int x)
++{
++    
++}
++
++void endhostent()
++{
++    sync();
++}
++#endif
++
+

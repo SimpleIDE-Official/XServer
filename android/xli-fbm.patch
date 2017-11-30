@@ -1,0 +1,12 @@
+--- fbm.c.orig	2017-12-01 00:53:34.565320758 +0800
++++ fbm.c	2017-12-01 00:54:23.784954949 +0800
+@@ -53,8 +53,7 @@
+ static int fbmin_image_test();
+ 
+ static char *
+-get_err_string(errno)
+-int errno;
++get_err_string(int errno)
+ {
+   int i;
+   for (i=0;fbm_err_strings[i].err_no != 0;i++)

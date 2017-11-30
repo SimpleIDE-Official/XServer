@@ -1205,6 +1205,9 @@ echo $PKGDIR: $PKGURL
 tar xvf ../$PKGDIR.tar.gz || exit 1
 cd $PKGDIR
 
+patch -p0 < ../../xli-gif.patch || exit 1
+patch -p0 < ../../xli-fbm.patch || exit 1
+
 echo "SRCS := bright.c clip.c cmuwmrast.c compress.c dither.c faces.c fbm.c \
       fill.c  g3.c gif.c halftone.c imagetypes.c img.c mac.c mcidas.c \
       mc_tables.c merge.c misc.c new.c options.c path.c pbm.c pcx.c \
@@ -1245,6 +1248,9 @@ sh -c '$STRIP xli'
 cd pie
 tar xvf ../../$PKGDIR.tar.gz || exit 1
 cd $PKGDIR
+
+patch -p0 < ../../../xli-gif.patch || exit 1
+patch -p0 < ../../../xli-fbm.patch || exit 1
 
 cp -f ../../$PKGDIR/Makefile ./
 cp -f ../../$PKGDIR/varargs.h ./
