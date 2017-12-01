@@ -798,7 +798,9 @@ static Bool xsdlConnectionClosed = 0;
 
 static void xsdlAudioCallback(void *userdata, Uint8 *stream, int len)
 {
-	int fd = (int)userdata;
+	intptr_t fd_ = (intptr_t) userdata;
+	int fd = (int) fd_;
+	
 	if (xsdlConnectionClosed)
 		return;
 	while (len > 0)
@@ -881,6 +883,7 @@ static void launchPulseAudio()
 static void *xsdlAudioThread(void *data)
 {
 	char infile[PATH_MAX];
+	intptr_t fd_;
 	int fd, notify;
 	struct inotify_event notifyEvents[8];
 
@@ -925,7 +928,8 @@ static void *xsdlAudioThread(void *data)
 			spec.channels = 2;
 			spec.samples = 4096;
 			spec.callback = xsdlAudioCallback;
-			spec.userdata = (void *)fd;
+			fd_ = fd;
+			spec.userdata = (void *)fd_;
 			SDL_OpenAudio(&spec, &obtained);
 			SDL_PauseAudio(0);
 			while (!xsdlConnectionClosed)
@@ -988,7 +992,8 @@ void OsVendorInit (void)
 static void *send_unicode_thread(void *param)
 {
 	// International text input - copy symbol to clipboard, and send copypaste key
-	int unicode = (int)param;
+	intptr_t unicode_ = (intptr_t) param;
+	int unicode = (int) unicode_;
 	char cmd[1024] = "";
 	char c[5] = "";
 	sprintf (cmd, "127.0.0.1:%s", display);
@@ -1018,11 +1023,12 @@ static void *set_clipboard_text_thread(void *param)
 
 void send_unicode(int unicode)
 {
+    intptr_t unicode_ = unicode;
 	pthread_t thread_id;
 	pthread_attr_t attr;
 	pthread_attr_init (&attr);
 	pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_DETACHED);
-	pthread_create (&thread_id, &attr, &send_unicode_thread, (void *)unicode);
+	pthread_create (&thread_id, &attr, &send_unicode_thread, (void *)unicode_);
 	pthread_attr_destroy (&attr);
 }
 
